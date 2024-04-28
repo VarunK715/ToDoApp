@@ -23,7 +23,7 @@ def home_page():
         task = request.form['task']
         # Insert data into the database
         cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO tododocs(task) VALUES(%s)", (task,))
+        cursor.execute("INSERT INTO tododocs(task, completed_at) VALUES(%s, NULL)", (task,))
         mysql.connection.commit()
         cursor.close()
         return redirect(url_for('home_page'))  # Redirect to the index page after adding task
@@ -45,21 +45,15 @@ def home_page():
 @app.route('/checkbox', methods=['POST'])
 def checkbox():
     if request.method == 'POST':
-        # Get the list of completed tasks from the form
         completed_tasks = request.form.getlist('completed')
-        
-        # Update the completed field in the database for each completed task
+        print(completed_tasks)
         cursor = mysql.connection.cursor()
-        current_time = int(time.time())
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for task_id in completed_tasks:
-            cursor.execute("UPDATE tododocs SET completed = 1 WHERE id = %s", (task_id,))
-        mysql.connection.commit()  # Commit the transaction
+            cursor.execute("UPDATE tododocs SET completed = 1, completed_at = %s WHERE id = %s", (current_time, task_id))
+        mysql.connection.commit()
         cursor.close()
-
-        # Redirect the user to the home page after the update
         return redirect(url_for('home_page'))
-
-    # If the request method is not POST, redirect to the home page
     return redirect(url_for('home_page'))
 
 
