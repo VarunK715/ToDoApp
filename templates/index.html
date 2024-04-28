@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+<style>
+    .completed-text{
+        text-decoration: line-through;
+    }
+</style>
+{% endblock %}
+
+
+{% block body %}
+
+<div class="container my-2">
+    <h2>Your ToDo</h2>
+</div>
+
+<div class="container my-3 border border-info">
+    <form action="/" method="POST">
+        <div class="m-2">
+            <input type="text" class="form-control mt-3" name="task" id="exampleFormControlInput1"
+                placeholder="Enter your task" required>
+        </div>
+        <div class="m-2">
+            <button type="submit" class="btn btn-info btn-sm px-3">Add Task</button>
+        </div>
+    </form>
+</div>
+
+<div class="container ">
+    <span>
+
+        <div class="row justify-content-end">
+            <div class="badge text-center bg-dark-subtle text-dark-emphasis text-wrap p-2 my-2" style="width:8rem;">
+                Total : {{count}} </div> &nbsp;
+            <div class="badge text-center bg-dark-subtle text-dark-emphasis text-wrap p-2 my-2" style="width:8rem;">
+                Completed : {{completed_count}} </div>
+        </div>
+
+    </span>
+</div>
+
+
+<div class="container border border-info">
+    <form id="myForm" action="/checkbox" method="POST">
+        {% if data|length == 0%}
+        <div class="alert alert-dark my-1" role="alert">
+            No ToDos Found, Please Add it
+        </div>
+        {% else %}
+        {% for info in data %}
+        <div class="row containerp-fluid border p-1 mx-1 my-2 text-bg-light">
+            <div class="col-1">
+                <input class="form-check-input mt-2 border border-danger mycheckbox" title="Mark As Completed" type="checkbox" value="{{info[0]}}"
+                    name="completed" {% if info[2]==1 %}checked{% endif %}>
+            </div>
+            <div class="col-1 mt-1">{{loop.index}}</div>
+            <div class="col-8 mt-1 text fs-6 text-capitalize {% if info[2] == 1 %}completed-text{% endif %}">{{info[1]}}</div>
+            <div class="col-2">
+                <span>
+                    {% if info[2] == 1 %}
+                    <button class="btn btn-success btn-sm" disabled>Update</button>
+                    {% else %}
+                    <a class="btn btn-success btn-sm" href="/update/{{info[0]}}" role="button">Update</a>
+                    {% endif %}
+                    <a class="btn btn-danger btn-sm" href="/delete/{{info[0]}}" role="button">Delete</a>
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    var checkboxes = document.querySelectorAll('.mycheckbox');
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            document.getElementById("myForm").submit();
+        });
+    });
+</script>
+
+
+{% endblock%}
